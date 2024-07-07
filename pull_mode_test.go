@@ -1,4 +1,4 @@
-package go1_23
+package playing
 
 import (
 	"iter"

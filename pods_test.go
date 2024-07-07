@@ -1,4 +1,4 @@
-package go1_23
+package playing
 
 import (
 	"iter"
@@ -16,6 +16,9 @@ var pods = []corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "pod-1",
 			UID:  types.UID("11111111-1111-1111-1111-111111111111"),
+			Annotations: map[string]string{
+				"pick-me": "true",
+			},
 		},
 	},
 	{
@@ -28,6 +31,9 @@ var pods = []corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "pod-3",
 			UID:  types.UID("33333333-3333-3333-3333-333333333333"),
+			Annotations: map[string]string{
+				"pick-me": "true",
+			},
 		},
 	},
 	{
@@ -48,6 +54,18 @@ func transform[K, V1, V2 any](seq iter.Seq[V1], m func(V1) (K, V2)) iter.Seq2[K,
 	}
 }
 
+func filter[T any](seq iter.Seq[T], filterFunc func(T) bool) iter.Seq[T] {
+	return func(yield func(T) bool) {
+		for v := range seq {
+			if filterFunc(v) {
+				if !yield(v) {
+					return
+				}
+			}
+		}
+	}
+}
+
 func TestSliceToMap(t *testing.T) {
 	itr := slices.Values(pods)
 	podsByName := maps.Collect(transform(itr, func(pod corev1.Pod) (string, corev1.Pod) {
@@ -60,4 +78,29 @@ func TestSliceToMap(t *testing.T) {
 		return pod.UID, pod.Name
 	}))
 	t.Logf("%#v\n", nameByUID)
+}
+
+func TestFilterSlice(t *testing.T) {
+	itr := slices.Values(pods)
+	filteredItr := filter(itr, func(pod corev1.Pod) bool {
+		return metav1.HasAnnotation(pod.ObjectMeta, "pick-me")
+	})
+
+	for v := range filteredItr {
+		t.Logf("%#v\n", v)
+	}
+}
+
+func TestFilterAndTransform(t *testing.T) {
+	pickMe := func(pod corev1.Pod) bool {
+		return metav1.HasAnnotation(pod.ObjectMeta, "pick-me")
+	}
+
+	podNameUID := func(pod corev1.Pod) (string, types.UID) {
+		return pod.Name, pod.UID
+	}
+
+	for k, v := range transform(filter(slices.Values(pods), pickMe), podNameUID) {
+		t.Logf("%q: %q", k, v)
+	}
 }
