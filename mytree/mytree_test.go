@@ -2,7 +2,7 @@ package mytree_test
 
 import (
 	"fmt"
-	"math/rand"
+	"math/rand/v2"
 	"slices"
 	"testing"
 
@@ -134,15 +134,15 @@ func getTree() *mytree.Tree[int] {
 
 func TestTree_Rand(t *testing.T) {
 	for range 1000 {
-		size := rand.Intn(100)
+		size := rand.N[int](100)
 		t.Run(fmt.Sprintf("size=%d", size), func(t *testing.T) {
 			expectedSize := size
 
 			tr := mytree.New[int]()
 
 			for range size {
-				val := rand.Intn(1000)
-				if rand.Intn(2)%2 == 1 {
+				val := rand.N[int](1000)
+				if rand.N[int](2)%2 == 1 {
 					val *= -1
 				}
 				if !tr.Insert(val) {
@@ -168,7 +168,7 @@ func TestTree_Rand(t *testing.T) {
 
 			list := mylist.New(vals...)
 			for list.Len() > 0 {
-				i := rand.Intn(list.Len())
+				i := rand.N[int](list.Len())
 				val, err := list.Remove(i)
 				tr.Remove(val)
 				if err != nil {
@@ -180,5 +180,18 @@ func TestTree_Rand(t *testing.T) {
 				t.Errorf("length should be 0, got %d", tr.Len())
 			}
 		})
+	}
+}
+
+func TestCollect(t *testing.T) {
+	values := []int{5, 7, 10, 8, 6, 3, 2, 4}
+
+	tree := mytree.Collect(slices.Values(values))
+	if len(values) != tree.Len() {
+		t.Errorf("tree length should be %d, but it's %d", len(values), tree.Len())
+	}
+
+	for v := range tree.Iter() {
+		t.Log(v)
 	}
 }

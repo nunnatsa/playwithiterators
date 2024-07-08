@@ -3,6 +3,7 @@ package mytree
 import (
 	"cmp"
 	"fmt"
+	"iter"
 	"strings"
 )
 
@@ -43,6 +44,62 @@ func (n *node[T]) insert(value T) bool {
 			return n.left.insert(value)
 		}
 	}
+}
+
+func Collect[T cmp.Ordered](itr iter.Seq[T]) *Tree[T] {
+	next, stop := iter.Pull(itr)
+	defer stop()
+
+	tr := New[T]()
+	v, hasMore := next()
+	if hasMore {
+		tr.root = &node[T]{
+			value: v,
+		}
+
+		for v, hasMore = next(); hasMore; v, hasMore = next() {
+			tr.root.insert(v)
+		}
+	}
+
+	return tr
+}
+
+func collectSlower[T cmp.Ordered](itr iter.Seq[T]) *Tree[T] {
+	next, stop := iter.Pull(itr)
+	defer stop()
+
+	tr := New[T]()
+	v, hasMore := next()
+	if hasMore {
+		tr.root = &node[T]{value: v}
+
+		for v, hasMore = next(); hasMore; v, hasMore = next() {
+			p := tr.root
+			for {
+				if p.value == v {
+					break
+				}
+
+				if p.value > v {
+					if p.right == nil {
+						p.right = &node[T]{value: v}
+						break
+					}
+					p = p.right
+
+				} else {
+					if p.left == nil {
+						p.left = &node[T]{value: v}
+						break
+					}
+					p = p.left
+				}
+			}
+		}
+	}
+
+	return tr
 }
 
 func (t *Tree[T]) Insert(value T) bool {
@@ -102,22 +159,22 @@ func (t *Tree[T]) Find(value T) bool {
 
 func (t *Tree[T]) Remove(value T) {
 	if t.root != nil {
-		t.root = t.root.Remove(value)
+		t.root = t.root.remove(value)
 	}
 }
 
-func (n *node[T]) Remove(value T) *node[T] {
+func (n *node[T]) remove(value T) *node[T] {
 	if n == nil {
 		return nil
 	}
 
 	if n.value > value {
 		if n.right != nil {
-			n.right = n.right.Remove(value)
+			n.right = n.right.remove(value)
 		}
 	} else if n.value < value {
 		if n.left != nil {
-			n.left = n.left.Remove(value)
+			n.left = n.left.remove(value)
 		}
 	} else {
 		if n.left == nil {
@@ -136,7 +193,7 @@ func (n *node[T]) Remove(value T) *node[T] {
 
 		n.value = minimum
 		if n.right != nil {
-			n.right = n.right.Remove(minimum)
+			n.right = n.right.remove(minimum)
 		}
 	}
 	return n
