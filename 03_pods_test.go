@@ -100,7 +100,12 @@ func TestFilterAndTransform(t *testing.T) {
 		return pod.Name, pod.UID
 	}
 
-	for k, v := range transform(filter(slices.Values(pods), pickMe), podNameUID) {
-		t.Logf("%q: %q", k, v)
-	}
+	m := maps.Collect(
+		transform(
+			filter(
+				slices.Values(pods),
+				pickMe),
+			podNameUID),
+	)
+	t.Logf("%#v\n", m)
 }

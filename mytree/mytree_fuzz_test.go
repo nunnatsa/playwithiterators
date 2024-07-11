@@ -19,7 +19,7 @@ func FuzzCollectStrings(f *testing.F) {
 			t.Errorf("the tree lenght must be at least %d, but it's %d", len(values), tr.Len())
 		}
 
-		next, stop := iter.Pull(tr.Iter())
+		next, stop := iter.Pull(tr.Values())
 		defer stop()
 		v, ok := next()
 		if !ok {

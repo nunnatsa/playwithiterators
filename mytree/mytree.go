@@ -125,7 +125,7 @@ func (n *node[T]) traverse(yield func(T) bool) {
 	}
 }
 
-func (t *Tree[T]) Iter() func(func(T) bool) {
+func (t *Tree[T]) Values() iter.Seq[T] {
 	return func(yield func(T) bool) {
 		for {
 			t.root.traverse(yield)

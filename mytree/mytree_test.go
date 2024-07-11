@@ -46,7 +46,7 @@ func TestTree_Insert(t *testing.T) {
 
 	first := true
 	var prev int
-	for v := range tr.Iter() {
+	for v := range tr.Values() {
 		fmt.Println(v)
 		if first {
 			first = false
@@ -58,7 +58,7 @@ func TestTree_Insert(t *testing.T) {
 		prev = v
 	}
 
-	s := slices.Collect(tr.Iter())
+	s := slices.Collect(tr.Values())
 	t.Log("tree before removing: \t" + tr.PrintDetails())
 	for i, v := range s {
 		tr.Remove(v)
@@ -156,7 +156,7 @@ func TestTree_Rand(t *testing.T) {
 				t.Errorf("length should be %d, got %d", expectedSize, l)
 			}
 
-			vals := slices.Collect(tr.Iter())
+			vals := slices.Collect(tr.Values())
 			t.Log(vals)
 			if !slices.IsSorted(vals) {
 				t.Errorf("values should be sorted")
@@ -191,7 +191,7 @@ func TestCollect(t *testing.T) {
 		t.Errorf("tree length should be %d, but it's %d", len(values), tree.Len())
 	}
 
-	for v := range tree.Iter() {
+	for v := range tree.Values() {
 		t.Log(v)
 	}
 }

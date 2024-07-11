@@ -20,7 +20,7 @@ func TestMyList(t *testing.T) {
 		t.Errorf("list length should be %d, but it's %d", len(pods), l.Len())
 	}
 
-	flt := filter(l.Iter(), func(pod corev1.Pod) bool {
+	flt := filter(l.Values(), func(pod corev1.Pod) bool {
 		_, ok := pod.Annotations["pick-me"]
 		return !ok
 	})
@@ -48,7 +48,7 @@ func TestMyTree(t *testing.T) {
 		t.Errorf("tree size should be %d, but it's %d", length, tr.Len())
 	}
 
-	trs := transform(tr.Iter(), func(num int) (int, bool) {
+	trs := transform(tr.Values(), func(num int) (int, bool) {
 		return num, num%2 == 0
 	})
 

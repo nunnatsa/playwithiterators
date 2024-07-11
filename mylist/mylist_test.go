@@ -2,6 +2,7 @@ package mylist_test
 
 import (
 	"iter"
+	"maps"
 	"slices"
 	"testing"
 
@@ -129,7 +130,7 @@ func TestList_Remove(t *testing.T) {
 }
 
 func printList[T any](t *testing.T, l *mylist.List[T]) {
-	s := slices.Collect(l.Iter())
+	s := slices.Collect(l.Values())
 	t.Log(s)
 }
 
@@ -147,10 +148,19 @@ func TestCollect(t *testing.T) {
 	l2.Push(4)
 	l2.Push(5)
 
-	l3 := mylist.Collect(l2.Iter())
+	l3 := mylist.Collect(l2.Values())
 
 	if ln := l3.Len(); ln != l2.Len() {
 		t.Errorf("Len() = %d, want %d", ln, l2.Len())
+	}
+}
+
+func TestAll(t *testing.T) {
+	l := mylist.New(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+	m := maps.Collect(l.All())
+
+	if len(m) != 10 {
+		t.Errorf("All() = %d, want %d", len(m), 10)
 	}
 }
 

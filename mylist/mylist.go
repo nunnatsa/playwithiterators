@@ -111,7 +111,7 @@ func (l *List[T]) Remove(index int) (T, error) {
 	return p.value, nil
 }
 
-func (l *List[T]) Iter() func(func(T) bool) {
+func (l *List[T]) Values() iter.Seq[T] {
 	return func(yield func(T) bool) {
 		for p := l.head; p != nil; p = p.next {
 			if !yield(p.value) {
@@ -121,7 +121,7 @@ func (l *List[T]) Iter() func(func(T) bool) {
 	}
 }
 
-func (l *List[T]) Iter2() func(func(int, T) bool) {
+func (l *List[T]) All() iter.Seq2[int, T] {
 	return func(yield func(int, T) bool) {
 		for i, p := 0, l.head; p != nil; i, p = i+1, p.next {
 			if !yield(i, p.value) {
