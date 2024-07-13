@@ -44,10 +44,10 @@ var pods = []corev1.Pod{
 	},
 }
 
-func filter[T any](seq iter.Seq[T], filterFunc func(T) bool) iter.Seq[T] {
+func filter[T any](seq iter.Seq[T], filterFn func(T) bool) iter.Seq[T] {
 	return func(yield func(T) bool) {
 		for v := range seq {
-			if filterFunc(v) {
+			if filterFn(v) {
 				if !yield(v) {
 					return
 				}
@@ -70,10 +70,10 @@ func TestFilterSlice(t *testing.T) {
 	t.Logf("%#v\n", s)
 }
 
-func transform[K, V1, V2 any](seq iter.Seq[V1], m func(V1) (K, V2)) iter.Seq2[K, V2] {
+func transform[K, V1, V2 any](seq iter.Seq[V1], transFn func(V1) (K, V2)) iter.Seq2[K, V2] {
 	return func(yield func(K, V2) bool) {
 		for v1 := range seq {
-			if !yield(m(v1)) {
+			if !yield(transFn(v1)) {
 				return
 			}
 		}
