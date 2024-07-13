@@ -52,7 +52,7 @@ func TestSlicesCollect(t *testing.T) {
 }
 
 func TestMapCollect(t *testing.T) {
-	m := maps.Collect(slices.Backward(numbers))
+	m := maps.Collect(slices.All(numbers))
 	t.Logf("%#v\n", m)
 }
 
