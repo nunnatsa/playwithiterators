@@ -70,8 +70,8 @@ func TestFors(t *testing.T) {
 			}
 		}
 
-		for i := range randNumGen {
-			fmt.Println(i)
+		for r := range randNumGen {
+			fmt.Println(r)
 		}
 	})
 }
