@@ -15,7 +15,7 @@ var numStr = map[int]string{
 func TestSlicesAll(t *testing.T) {
 	itr := slices.All(numbers)
 
-	for idx, v := range itr { // same as: for idx, v := range numbers{}
+	for idx, v := range itr { // same as: for idx, v := range numbers
 		t.Log(idx, v)
 	}
 }

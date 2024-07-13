@@ -44,16 +44,6 @@ var pods = []corev1.Pod{
 	},
 }
 
-func transform[K, V1, V2 any](seq iter.Seq[V1], m func(V1) (K, V2)) iter.Seq2[K, V2] {
-	return func(yield func(K, V2) bool) {
-		for v1 := range seq {
-			if !yield(m(v1)) {
-				return
-			}
-		}
-	}
-}
-
 func filter[T any](seq iter.Seq[T], filterFunc func(T) bool) iter.Seq[T] {
 	return func(yield func(T) bool) {
 		for v := range seq {
@@ -61,6 +51,30 @@ func filter[T any](seq iter.Seq[T], filterFunc func(T) bool) iter.Seq[T] {
 				if !yield(v) {
 					return
 				}
+			}
+		}
+	}
+}
+
+func TestFilterSlice(t *testing.T) {
+	itr := slices.Values(pods)
+	filteredItr := filter(itr, func(pod corev1.Pod) bool {
+		return metav1.HasAnnotation(pod.ObjectMeta, "pick-me")
+	})
+
+	for v := range filteredItr {
+		t.Logf("%#v\n", v)
+	}
+
+	s := slices.Collect(filteredItr)
+	t.Logf("%#v\n", s)
+}
+
+func transform[K, V1, V2 any](seq iter.Seq[V1], m func(V1) (K, V2)) iter.Seq2[K, V2] {
+	return func(yield func(K, V2) bool) {
+		for v1 := range seq {
+			if !yield(m(v1)) {
+				return
 			}
 		}
 	}
@@ -78,17 +92,6 @@ func TestSliceToMap(t *testing.T) {
 		return pod.UID, pod.Name
 	}))
 	t.Logf("%#v\n", nameByUID)
-}
-
-func TestFilterSlice(t *testing.T) {
-	itr := slices.Values(pods)
-	filteredItr := filter(itr, func(pod corev1.Pod) bool {
-		return metav1.HasAnnotation(pod.ObjectMeta, "pick-me")
-	})
-
-	for v := range filteredItr {
-		t.Logf("%#v\n", v)
-	}
 }
 
 func TestFilterAndTransform(t *testing.T) {
